@@ -54,8 +54,15 @@ for iter in range(niter_refinement):
         res = 0
         RHS = np.zeros((NX))
         for j in range(1, NX - 1):
-            Tx = (T[j + 1] - T[j - 1]) / (2 * dx)
-            Txx = (T[j - 1] - 2 * T[j] + T[j + 1]) / (dx**2)
+            # dérivée advective (upwind)
+            if V >= 0:
+                Tx = (T[j] - T[j-1]) / dx
+            else:
+                Tx = (T[j+1] - T[j]) / dx
+
+            # diffusion (toujours centrée)
+            Txx = (T[j-1] - 2*T[j] + T[j+1]) / (dx**2)
+
             RHS[j] = dt * (-V * Tx + K * Txx - lamda * T[j] + F[j])
             res += abs(RHS[j])
         for j in range(1, NX - 1):
