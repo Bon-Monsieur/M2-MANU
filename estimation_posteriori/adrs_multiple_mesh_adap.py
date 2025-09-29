@@ -180,116 +180,82 @@ for err in err_values:
     errorL2_results.append(errL2_final)
     iterations_results.append(n_iter)
 
-# Tracé des résultats
-plt.figure(figsize=(15, 10))
+# =======================
+#   TRACÉ DES RÉSULTATS
+# =======================
 
-# Graphique 1: NX en fonction de err
-plt.subplot(2, 3, 1)
-plt.loglog(err_values, NX_results, 'bo-', linewidth=2, markersize=8, label='NX(err)')
-plt.xlabel('Tolérance d\'erreur ε', fontsize=12)
-plt.ylabel('Nombre de points NX', fontsize=12)
-plt.title('Évolution de NX en fonction de ε\n(échelle log-log)', fontsize=12)
-plt.grid(True, alpha=0.3, which='both')
+# ---------- FIGURE 1 : ANALYSE DES COURBES ----------
+fig1 = plt.figure(figsize=(10, 6))
 
-# Ajout de la loi de puissance
+# Graphique 1 : NX en fonction de err
+ax1 = fig1.add_subplot(2, 2, 1)
+ax1.loglog(err_values, NX_results, 'bo-', linewidth=2, markersize=8, label='NX(err)')
+ax1.set_xlabel("Tolérance d'erreur ε", fontsize=12)
+ax1.set_ylabel("Nombre de points NX", fontsize=12)
+ax1.set_title("Évolution de NX en fonction de ε (log-log)", fontsize=12)
+ax1.grid(True, which='both', alpha=0.3)
 if len(err_values) > 1:
     coeffs = np.polyfit(np.log(err_values), np.log(NX_results), 1)
     power_law = np.exp(coeffs[1]) * np.array(err_values)**coeffs[0]
-    plt.loglog(err_values, power_law, 'r--', linewidth=1, 
-              label=f'NX ∝ ε^{coeffs[0]:.2f}')
-plt.legend()
+    ax1.loglog(err_values, power_law, 'r--',
+               label=f'NX ∝ ε^{coeffs[0]:.2f}')
+ax1.legend()
 
-# Graphique 2: Erreur en fonction de NX
-plt.subplot(2, 3, 2)
-plt.loglog(NX_results, errorL2_results, 'ro-', linewidth=2, markersize=8)
-plt.xlabel('Nombre de points NX', fontsize=12)
-plt.ylabel('Erreur L2', fontsize=12)
-plt.title('Erreur en fonction de NX\n(échelle log-log)', fontsize=12)
-plt.grid(True, alpha=0.3, which='both')
+# Graphique 2 : Erreur en fonction de NX
+ax2 = fig1.add_subplot(2, 2, 2)
+ax2.loglog(NX_results, errorL2_results, 'ro-', linewidth=2, markersize=8)
+ax2.set_xlabel('Nombre de points NX', fontsize=12)
+ax2.set_ylabel('Erreur L2', fontsize=12)
+ax2.set_title('Erreur en fonction de NX (log-log)', fontsize=12)
+ax2.grid(True, which='both', alpha=0.3)
 
-# Graphique 3: Évolution des itérations
-plt.subplot(2, 3, 3)
-plt.semilogy(err_values, iterations_results, 'go-', linewidth=2, markersize=8)
-plt.xlabel('Tolérance d\'erreur ε', fontsize=12)
-plt.ylabel('Nombre d\'itérations d\'adaptation', fontsize=12)
-plt.title('Itérations nécessaires pour convergence', fontsize=12)
-plt.grid(True, alpha=0.3, which='both')
+# Graphique 3 : Itérations nécessaires
+ax3 = fig1.add_subplot(2, 2, 3)
+ax3.semilogy(err_values, iterations_results, 'go-', linewidth=2, markersize=8)
+ax3.set_xlabel('Tolérance d\'erreur ε', fontsize=12)
+ax3.set_ylabel('Itérations d\'adaptation', fontsize=12)
+ax3.set_title('Nombre d\'itérations', fontsize=12)
+ax3.grid(True, which='both', alpha=0.3)
 
-# Graphique 4: Rapport NX/err
-plt.subplot(2, 3, 4)
+# Graphique 4 : Rapport NX/ε
+ax4 = fig1.add_subplot(2, 2, 4)
 ratio = np.array(NX_results) / np.array(err_values)
-plt.semilogy(err_values, ratio, 'mo-', linewidth=2, markersize=8)
-plt.xlabel('Tolérance d\'erreur ε', fontsize=12)
-plt.ylabel('NX / ε', fontsize=12)
-plt.title('Rapport complexité/précision', fontsize=12)
-plt.grid(True, alpha=0.3, which='both')
+ax4.semilogy(err_values, ratio, 'mo-', linewidth=2, markersize=8)
+ax4.set_xlabel('Tolérance d\'erreur ε', fontsize=12)
+ax4.set_ylabel('NX / ε', fontsize=12)
+ax4.set_title('Rapport NX/ε', fontsize=12)
+ax4.grid(True, which='both', alpha=0.3)
 
-# Graphique 5: Tableau récapitulatif
-plt.subplot(2, 3, 5)
-plt.axis('off')
-table_data = []
-for i, err in enumerate(err_values):
-    table_data.append([f'ε = {err}', f'NX = {NX_results[i]}', 
-                      f'Erreur = {errorL2_results[i]:.2e}', 
-                      f'Itér. = {iterations_results[i]}'])
+fig1.tight_layout()
+fig1.savefig("NX_err_analysis_part1.png", dpi=200)
 
-table = plt.table(cellText=table_data,
-                 colLabels=['ε', 'NX', 'Erreur L2', 'Itérations'],
-                 loc='center',
-                 cellLoc='center')
+# ---------- FIGURE 2 : TABLEAU + LOI D'ÉCHELLE ----------
+fig2 = plt.figure(figsize=(10, 6))
+
+# Sous-plot 1 : tableau récapitulatif
+ax5 = fig2.add_subplot(1, 2, 1)
+ax5.axis('off')
+table_data = [[f'{err_values[i]:.4f}',
+               f'{NX_results[i]}',
+               f'{errorL2_results[i]:.2e}',
+               f'{iterations_results[i]}']
+              for i in range(len(err_values))]
+table = ax5.table(cellText=table_data,
+                  colLabels=['ε', 'NX', 'Erreur L2', 'Itérations'],
+                  loc='center', cellLoc='center')
 table.auto_set_font_size(False)
-table.set_fontsize(10)
-table.scale(1, 2)
-plt.title('Récapitulatif des résultats', fontsize=12)
+table.set_fontsize(9)
+table.scale(1.2, 2.0)
+ax5.set_title('Récapitulatif des résultats', fontsize=12, pad=20)
 
-# Graphique 6: Loi d'échelle
-plt.subplot(2, 3, 6)
-if len(err_values) > 1:
-    plt.plot(1/np.array(err_values), NX_results, 'co-', linewidth=2, markersize=8)
-    plt.xlabel('1/ε', fontsize=12)
-    plt.ylabel('NX', fontsize=12)
-    plt.title('NX en fonction de 1/ε', fontsize=12)
-    plt.grid(True, alpha=0.3)
+# Sous-plot 2 : loi d’échelle NX vs 1/ε
+ax6 = fig2.add_subplot(1, 2, 2)
+ax6.plot(1/np.array(err_values), NX_results, 'co-', linewidth=2, markersize=8)
+ax6.set_xlabel('1/ε', fontsize=12)
+ax6.set_ylabel('NX', fontsize=12)
+ax6.set_title('NX en fonction de 1/ε', fontsize=12)
+ax6.grid(True, which='both', alpha=0.3)
 
-plt.tight_layout()
-plt.savefig('NX(err).png', dpi=200)
+fig2.tight_layout()
+fig2.savefig("NX_err_analysis_part2.png", dpi=200)
 plt.show()
-
-# Analyse des résultats
-print("\n" + "="*60)
-print("ANALYSE DES RÉSULTATS")
-print("="*60)
-
-print("\n1. ÉVOLUTION DE NX EN FONCTION DE err:")
-print("   ε      |    NX    |   NX/ε   |  Rapport")
-print("-"*40)
-for i in range(len(err_values)):
-    if i > 0:
-        ratio_nx = NX_results[i] / NX_results[i-1]
-        ratio_err = err_values[i-1] / err_values[i]  # err diminue
-        print(f"  {err_values[i]:.4f}  |   {NX_results[i]:4d}    |  {NX_results[i]/err_values[i]:7.1f}  |  x{ratio_nx:.2f} pour err/{ratio_err:.1f}")
-    else:
-        print(f"  {err_values[i]:.4f}  |   {NX_results[i]:4d}    |  {NX_results[i]/err_values[i]:7.1f}  |  -")
-
-print("\n2. CRITÈRES D'ARRÊT POUR L'ITÉRATION D'ADAPTATION:")
-print("   a) |NXₙ - NXₙ₋₁| ≤ 2 : Maillage stabilisé")
-print("   b) Nombre max d'itérations atteint")
-print("   c) Changement d'erreur < 1% entre itérations")
-print("   d) Résidu relatif < ε (convergence temporelle)")
-print("   e) Temps d'intégration maximum atteint")
-
-print("\n3. LOI D'ÉCHELLE OBSERVÉE:")
-if len(err_values) > 1:
-    # Calcul de l'exposant
-    log_err = np.log(np.array(err_values))
-    log_nx = np.log(np.array(NX_results))
-    slope, intercept = np.polyfit(log_err, log_nx, 1)
-    print(f"   NX ∝ ε^{slope:.3f}")
-    print(f"   Soit NX ∝ 1/ε^{abs(slope):.3f}")
-    
-    if abs(slope + 0.5) < 0.1:
-        print("   → Comportement typique d'adaptation de maillage (pente ≈ -0.5)")
-    elif abs(slope + 1.0) < 0.1:
-        print("   → Comportement linéaire (pente ≈ -1.0)")
-    else:
-        print(f"   → Comportement spécifique au problème")
