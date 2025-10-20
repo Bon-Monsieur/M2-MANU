@@ -1,0 +1,80 @@
+// =====================================================
+// Rotating Hill problem - Convection-Diffusion equation
+// ∂v/∂t + u·∇v - νΔv = 0
+// =====================================================
+
+int kt = 5;          // nb de sous-itérations temporelles par boucle
+int kloop = 1;       // nb d'itérations adaptatives internes
+int nbadap = 60;     // nb max d'adaptations
+bool inq = 0;
+
+real tol = 0.05;     // tolérance adaptation
+real tol2 = 5e-3;    // critère d'arrêt erreur
+real nu = 0.002;     // coefficient de diffusion
+real dt = 0.05;      // pas de temps
+real Tfinal = 2.0;   // temps final
+real t = 0;          // temps initial
+
+// ---------- Mesh + FE space ----------
+border a(t=0, 2*pi) { x = cos(t); y = sin(t); };
+mesh th = buildmesh(a(70));
+fespace Vh(th, P1);
+
+// ---------- Velocity field (rotation) ----------
+Vh u1 = y, u2 = -x;
+
+// ---------- Initial condition (two hills) ----------
+func rhill1 = sqrt((x-0.3)^2 + (y-0.3)^2);
+func hill1 = 1 - tanh(30*(rhill1 - 0.2));
+func rhill2 = sqrt((x+0.3)^2 + (y+0.3)^2);
+func hill2 = 1 - tanh(30*(rhill2 - 0.2));
+
+Vh v = hill1 + hill2; // initial field
+Vh vold;    // déclaration
+vold[] = v[]; // copie des valeurs de v
+
+
+plot(v, wait=1, cmm="Initial condition");
+
+// ---------- Convergence file ----------
+ofstream file("convergence.txt");
+file.precision(14);
+
+// ---------- Time loop ----------
+for (int step = 0; t < Tfinal; step++) {
+    t += dt;
+
+    // ----- weak formulation -----
+    // (v - vold)/dt + u·∇v - νΔv = 0
+    // implicit in v (stabilizes diffusion)
+    problem convection_diffusion(v, vold, solver=CG)
+        = int2d(th)(
+              v*vold/dt                // time term
+            + (u1*dx(vold) + u2*dy(vold))*v // convection (semi-implicite)
+            + nu*(dx(vold)*dx(v) + dy(v_old)*dy(v)) // diffusion
+          )
+        - int2d(th)(
+              v*vold/dt
+          );
+
+    convection_diffusion; // solve PDE
+
+    // ----- mesh adaptation -----
+    th = adaptmesh(th, v, err=tol, hmax=0.5, hmin=0.01, inquire=inq);
+    vold = v; // update
+
+    // ----- error & output -----
+    real errl2 = sqrt(int2d(th)(square(v - (hill1 + hill2))));
+    cout << "Step " << step
+         << ", time = " << t
+         << ", L2 error = " << errl2
+         << ", min(v)=" << v[].min
+         << ", max(v)=" << v[].max << endl;
+    file << t << " " << errl2 << endl;
+
+    plot(th, v, fill=false, cmm="t = "+t+", errL2 = "+errl2, wait=0);
+
+    if (errl2 < tol2) break;
+}
+
+cout << "Simulation complete. Results written to convergence.txt" << endl;
