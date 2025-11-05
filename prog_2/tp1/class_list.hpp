@@ -36,7 +36,7 @@ public:
     friend std::ostream& operator<<(std::ostream& os, const list<T>& list) {
         os << "List with " << list.number_ << " items:\n";
         for (int ii = 0; ii < list.number_; ii++) {
-            os << "  item_[" << ii << "] address = " << list[ii] << "\n";
+            os << "  item_[" << ii << "] = " << list[ii] << "\n";
         }
         return os;
     }

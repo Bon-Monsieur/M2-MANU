@@ -1,13 +1,6 @@
 #include "class_list.hpp"
-
-double factorial(int n) {
-    if (n == 0 || n == 1) return 1;
-    double res = 1;
-    for (int i = 2; i <= n; i++) {
-        res *= i;
-    }
-    return res;
-}
+#include "class_dynamic_vector.hpp"
+#include "class_binomial.hpp"
 
 template<typename T>
 T inverse(T x){
@@ -41,6 +34,8 @@ const T Taylor ( list<T> const& f , T const& h ){
 
 
 int main(){
+    
+    /*
     // Essaie liste des dérivées de 1/x en 2 jusqu'à l'ordre 5
     double a = 2.0;
     int n = 5;
@@ -51,6 +46,13 @@ int main(){
     double h = 0.1;
     double approx = Taylor(my_list,h);
     std::cout << "Approximation de 1/" << a+h << " : " << approx << std::endl;
+    */
+
+    // Essaie de la classe binomiale
+    int M = 10;
+    binomial<double> my_binom(M);
+    std::cout << my_binom;
     
+
     return 0;
 }
