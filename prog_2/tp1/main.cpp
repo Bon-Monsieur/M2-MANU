@@ -11,7 +11,7 @@ template<typename T>
 const list<T> derive_inverse(T const& a, int n){
     list<T> temp(n+1,0);
     temp(0) = inverse(a);
-    for (int k = 1; k < n+1; k++){
+    for (int k = 1; k <= n; k++){
         temp(k) = -k/a*temp(k-1);
     }
     return temp;
@@ -33,6 +33,18 @@ const T Taylor ( list<T> const& f , T const& h ){
 
 
 
+template<typename T>
+T derivee_produit(list<T> const& f, list<T> const& g, int n){
+    T sum = T(0);
+    binomial<T> coeff(n);
+    for (int kk=0; kk <= n; kk++){
+        sum += f[kk]*g[n-kk]*coeff(n,kk);
+    }
+    return sum;
+}
+
+
+
 int main(){
     
     /*
@@ -48,11 +60,24 @@ int main(){
     std::cout << "Approximation de 1/" << a+h << " : " << approx << std::endl;
     */
 
+
+    /*
     // Essaie de la classe binomiale
     int M = 10;
     binomial<double> my_binom(M);
     std::cout << my_binom;
     std::cout << "Binomial coefficient C(10,3) = " << my_binom(10,3) << std::endl;
+    */
+
+    // Essaie de la dérivée d'un produit de fonctions
+    int n = 5;
+    double x = 1.0;
+    list<double> f(derive_inverse(x,n)); // Tableau dérvivée de 1/x
+    list<double> g(derive_inverse(x,n)); // Tableau dérvivée de 1/x
+
+    
+    double deriv_prod = derivee_produit(f,g,n); // Dérivée ordre n de 1/x^2
+    std::cout << "(fg)^(n) = " << deriv_prod << std::endl;
 
     return 0;
 }
