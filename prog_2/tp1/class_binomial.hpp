@@ -7,12 +7,7 @@ template<typename T>
 class binomial : public list<DynamicVector<T>> {
     public: 
         binomial(int M);
-        T operator()(int n, int k) {
-            if (k < 0 || k > n) {
-                throw std::out_of_range("Index k out of range");
-            }
-            return (*(this->item_(n)))[k];
-        }
+        T operator()(int n, int k);
 };
 
 
@@ -27,4 +22,12 @@ binomial<T>::binomial(int M) : list<DynamicVector<T>>(M+1) {
         }
         this->item(mm) = new DynamicVector<T>(temp);
     }
+}
+
+template<typename T>
+T binomial<T>::operator()(int n, int k) {
+    if (k < 0 || k > n) {
+        throw std::out_of_range("Index k out of range");
+    }
+    return (*(this->item(n)))[k];
 }

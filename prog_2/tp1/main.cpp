@@ -52,7 +52,7 @@ int main(){
     int M = 10;
     binomial<double> my_binom(M);
     std::cout << my_binom;
-    
+    std::cout << "Binomial coefficient C(10,3) = " << my_binom(10,3) << std::endl;
 
     return 0;
 }
