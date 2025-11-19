@@ -1,6 +1,7 @@
 import numpy as np
 from PIL import Image
 import matplotlib.pyplot as plt
+import math
 
 # Charger l'image
 chemin_image = r"C:\Users\Raphael\Desktop\FAC\M2-MANU\probleme_inverse\img\baboon256.png"
@@ -78,13 +79,59 @@ def transformee_fourier_2D_numpy(s):
     """
     return np.fft.fft2(s)
 
+def transformee_fourier_inverse_2D_numpy(S):
+    """
+    Utilise l'algorithme FFT inverse de NumPy
+    """
+    return np.fft.ifft2(S)
+
+
+
+import numpy as np
+
+def erreur_pourcentage(img1, img2):
+    """
+    Calcule le pourcentage d'erreur relative moyenne entre deux images.
+    
+    Paramètres
+    ----------
+    img1, img2 : ndarray
+        Images à comparer (même taille).
+    
+    Retour
+    ------
+    err : float
+        Pourcentage d'erreur moyenne.
+    """
+    img1 = np.array(img1, dtype=float)
+    img2 = np.array(img2, dtype=float)
+
+    diff = np.abs(img1 - img2)
+    denom = np.maximum(np.abs(img1), 1e-12)  # éviter division par zéro
+
+    erreur = np.mean(diff / denom) * 100
+    return erreur
+
+
+
+def filtreGaussien(P):
+    epsilon = 0.05
+    sigma = P*1.0/math.sqrt(-2*math.log(epsilon))
+    h = np.zeros((2*P+1,2*P+1))
+    som = 0
+    for m in range(-P,P+1):
+        for n in range(-P,P+1):
+            h[m+P][n+P] = math.exp(-(n*n+m*m)/(2*sigma*sigma))
+            som += h[m+P][n+P]
+    h = h/som
+    return h
 
 # Calculer la transformée de Fourier 2D
 # S = transformée_fourier_2D_manuelle(matrice_gris)
 # S = transformee_fourier_2D_vectorisee(matrice_gris)
 S = transformee_fourier_2D_numpy(matrice_gris)
 np.savetxt("fourier_S.txt", S, fmt='%d')
-
+S_recons = transformee_fourier_inverse_2D_numpy(S)
 
 # Calculer le spectre de magnitude (pour visualisation)
 magnitude_spectrum = np.abs(S)
@@ -93,6 +140,7 @@ magnitude_spectrum_centree = np.fft.fftshift(magnitude_spectrum) # Centrer le sp
 
 magnitude_log = np.log(magnitude_spectrum_centree) # Échelle logarithmique pour mieux voir
 
+test = transformee_fourier_inverse_2D_numpy(S * magnitude_spectrum) # fou
 # ===== AFFICHAGE =====
 fig, axes = plt.subplots(1, 3, figsize=(15, 5))
 
@@ -107,9 +155,10 @@ axes[1].set_title('Transformée de Fourier de S(u,v)')
 axes[1].axis('off')
 
 # Spectre en échelle log
-axes[2].imshow(magnitude_log, cmap='gray')
-axes[2].set_title('Transformée de Fourier en échelle logarithmique')
+axes[2].imshow(test.real, cmap='gray')
+axes[2].set_title('Transformée de Fourier inverse')
 axes[2].axis('off')
 
+print(f"Erreur relative moyenne: {erreur_pourcentage(matrice_gris, test.real):.6f} %")
 plt.tight_layout()
 plt.show()
