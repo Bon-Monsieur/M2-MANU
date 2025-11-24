@@ -2,34 +2,30 @@
 
 
 template<typename T>
-void print(linked_list<T> const& head) {
-    linked_list<T> const* current = &head;
-
-    while (current != nullptr) {
-        std::cout << current->item() << " ";
-        current = current->p_next();
+void print(linked_list<T> const& mylist) {
+    std::cout << mylist.item() << " ";
+    if (mylist.p_next() != nullptr){
+        print(*mylist.p_next());
     }
-
-    std::cout << std::endl;
 }
 
 
 
 
 int main() {
-    // Création dynamique de chaque nœud
-    linked_list<double>* node1 = new linked_list<double>(3.21);
-    linked_list<double>* node2 = new linked_list<double>(4.56, node1);
-    linked_list<double>* node3 = new linked_list<double>(7.89, node2);
+    linked_list<double> mylist(4.);
+    mylist.append(5.);
+    mylist.append(6.);
+    double val = 0.;
+    mylist.insert_next_item(val);
+    mylist.insert_first_item(val);
+    print(mylist);
+    std::cout << std::endl;
+    //linked_list<double> mylist2(1.) ;
+    //mylist2= mylist;
+    //print(mylist2);
 
-    print(*node3);
-    std::cout << "Last item: " << node3->last().item() << std::endl;
-
-    
-    delete node2; // Supprime toute la liste après le node2 (non compris)
-
-    std::cout << "After deletion of node1:" << std::endl;
-    print(*node3); // Affiche la liste après la suppression
-    
+    mylist.drop_next_item();
+    print(mylist);
     return 0;
 }
