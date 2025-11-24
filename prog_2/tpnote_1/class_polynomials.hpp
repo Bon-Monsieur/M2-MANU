@@ -13,13 +13,12 @@ public:
     polynomial(size_t degree);
     polynomial( size_t degree, T value );
 
-    inline size_t degree() const {return this->number() - 1;} 
+    inline size_t degree() const {return this->number()-1;} 
 
     T operator()(T x);
 
     // Surcharge de l’opérateur <<
     friend std::ostream& operator<<(std::ostream& os, const polynomial<T>& p) {
-
         for (int ii = p.degree(); ii >= 1; ii--) {
             os << p[ii]<< "*x^"<< ii << " + ";
         }
@@ -64,16 +63,14 @@ public:
 };
 
 template<typename T>
-polynomial<T>::polynomial(size_t degree) : list<T>(degree + 1)
-{
+polynomial<T>::polynomial(size_t degree) : list<T>(degree + 1){
     for (size_t i = 0; i <= degree; ++i) {
         this->item(i) = new T(0);
     }
 }
 
 template<typename T>
-polynomial<T>::polynomial(size_t degree, T value) : list<T>(degree + 1)
-{
+polynomial<T>::polynomial(size_t degree, T value) : list<T>(degree + 1){
     for (size_t i = 0; i <= degree; ++i) {
         this->item(i) = new T(value);
     }
