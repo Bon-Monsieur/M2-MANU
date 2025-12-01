@@ -38,8 +38,10 @@ class linked_list {
         void drop_next_item();
         void drop_first_item();
 
-        void truncate_items(double threshold);     
+        void truncate_items(double threshold); 
         
+        const linked_list<T>& linked_list<T>::operator+=(linked_list<T>& L);
+        linked_list<T>& linked_list<T>::order( size_t length );
 };
 
 
@@ -122,7 +124,62 @@ void linked_list<T>::drop_first_item(){
 
 template<typename T>
 void linked_list<T>::truncate_items(double threshold){
-    if (lenght()==1){
-        
+    if (p_next()){
+        if (p_next()->item().get_value() < threshold){
+            drop_next_item();
+            truncate_items(threshold);
+        }
+        else{
+            p_next()->truncate_items(threshold);
+        }
     }
+    if (p_next() && item().get_value() < threshold )
+    {
+        drop_first_item();
+    }
+}
+
+
+template<typename T>
+const linked_list<T>& linked_list<T>::operator+=(linked_list<T>& L){
+    linked_list<T>* p_scan1 = this;
+    linked_list<T>* p_scan2 = &L;
+
+    if (L.item() <= item()){
+        insert_first_item(L.item());
+        p_scan2 = p_scan2->p_next();
+    }
+    for(; p_scan1->p_next( ) ; p_scan1=p_scan1->p_next()){  // Exactement comme in while
+        if (p_scan2 && p_scan1->item()==p_scan2.item()){
+            p_scan2 = p_scan2->p_next();
+            
+        } // Vérifier que les éléments ne sont pas égaux
+        for(; p_scan2 && (p_scan2->item() < p_scan1->p_next()->item ( ) ) ; p_scan2 = p_scan2->p_next()){
+            p_scan1->insert_next_item (p_scan2->item());
+            p_scan1 = p_scan1->p_next();
+        }
+    }
+    if (p_scan2 && p_scan1->item() == p_scan2.item()){
+        p_scan2 = p_scan2->p_next();
+    }
+    if (p_scan2){
+        p_scan1->p_next() = new linked_list<T>(*p_scan2);
+    }
+    return *this;
+}
+
+
+template<class T>
+linked_list<T>& linked_list<T>::order( size_t length ){
+    linked_list<T>* p_scan1 = this;
+    for (auto count =0 ; count < length/2-1; ++count){
+        p_scan1 = p_scan1->p_next();
+    }
+    linked_list<T>* p_scan2 = p_scan1->p_next();
+    p_scan1->p_next() = nullptr; // important to "cut" the second half of the calling linked_list
+
+    this->order(length/2);
+    *this.operator+=(p_scan2->order(length - length/2));
+
+    return *this;
 }
