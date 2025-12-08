@@ -40,8 +40,8 @@ class linked_list {
 
         void truncate_items(double threshold); 
         
-        const linked_list<T>& linked_list<T>::operator+=(linked_list<T>& L);
-        linked_list<T>& linked_list<T>::order( size_t length );
+        const linked_list<T>& operator+=(linked_list<T>& L);
+        linked_list<T>& order( size_t length );
 };
 
 
