@@ -32,6 +32,7 @@ class node{
         
 };
 
+typedef node<point2d> vertex;
 
 template<typename POINT_T>
 node<POINT_T>::node(POINT_T const& loc, int ind, size_t sharing_elements, size_t sharing_faces) : location_(loc), index_(ind), sharing_elements_(sharing_elements), sharing_faces_(sharing_faces){}

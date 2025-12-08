@@ -1,28 +1,45 @@
 #include "class_point.hpp"
 #include "class_node.hpp"
 #include "class_element.hpp"
+#include "class_mesh.hpp"
 #include <iostream>
 
 
-
-
-
+// vertex = node<point2d>
 
 
 int main(){
-    point2d pt1(0.0,0.0);
-    point2d pt2(0.0, 1.0);
-    point2d pt3(1.0, 0.0);
-    point2d pt4(1.0, 1.0);
-    node<point2d> n1(pt1, 1, 0, 0);
-    node<point2d> n2(pt2, 2, 0, 0);
-    node<point2d> n3(pt3, 3, 0, 0);
-    node<point2d> n4(pt4, 4, 0, 0);
+    vertex* a = new vertex(point2d(1.,1.));
+    vertex* b = new vertex(point2d(2.,2.));
+    vertex* c = new vertex(point2d(2.,0.));
+    vertex* d = new vertex(point2d(3.,1.));
+    vertex* e = new vertex(point2d(3.,3.));
 
-    element<point2d,3> elem(n1, n2, n3);
-    std::cout << "node loc " << elem << std::endl;
+    triangle t1(*a,*b,*c);
+    triangle t2(*b,*c,*d);
+    triangle t3(*b,*d,*e);
+
     
+    int ind=1;
+    t1.indexing(ind);
 
+    std::cout << "Indices after indexing t1: (4 is expected)" << ind << std::endl;
+    t1.print_vertices_indices();
+    t1.reset_indices();
+    t1.print_vertices_indices();
+
+    triangulation mymesh(t1);  // maillage avec t1 comme premier élément
+    mymesh.append(t2);
+    mymesh.append(t3);
+
+    mymesh.indexing();
+    std::cout << "indices t1: " << std::endl;
+    t1.print_vertices_indices();
+    std::cout << "indices t2: " << std::endl;
+    t2.print_vertices_indices();
+    std::cout << "indices t3: " << std::endl;
+    t3.print_vertices_indices();
+    
 
 
     return 0;

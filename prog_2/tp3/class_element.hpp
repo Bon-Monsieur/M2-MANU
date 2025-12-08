@@ -1,6 +1,5 @@
 #pragma once
 #include "class_node.hpp"
-#include "class_point.hpp"
 // On utilise des adresses de point car les points peuvent être partagés entre plusieurs éléments
 
 template<class T, int NVERTICES>
@@ -24,8 +23,8 @@ class element{
 
         void reset_indices(); // met les indices des noeuds à -1 (leur valeur initiale)
         void indexing(int& count); // assigne des indices aux noeuds de l'élément en partant de la valeur count et incrémente count en conséquence
+        void print_vertices_indices();
 
-        
         friend std::ostream& operator<<(std::ostream& os, const element<T,NVERTICES>& e) {
             for (int i = 0; i < NVERTICES; ++i) {
                 os << *(e.vertices_[i])<< " ";
@@ -95,9 +94,15 @@ template<class T, int NVERTICES>
 size_t operator<(node<T> const& n, element<T,NVERTICES> const& e){
     for (int i = 0; i < NVERTICES; ++i) {
         if (&n == e.vertex(i)) {
-            return true;
+            return i+1;
         }
     }
-    return false;
+    return 0;
 }
 
+template<typename T, int NVERTICES>
+void element<T, NVERTICES>::print_vertices_indices(){
+    for (int i = 0; i < NVERTICES; ++i) {
+        std::cout << "This->vertices_[i]->index= " << this->vertices_[i]->index() << std::endl;
+    }
+}
