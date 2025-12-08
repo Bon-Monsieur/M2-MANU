@@ -156,8 +156,13 @@ const point<NDIM> operator+(const point<NDIM>& p)
 template<int NDIM>
 std::ostream& operator<<(std::ostream& os, const point<NDIM>& p)
 {
+  os << '(';
   for(int ii=0; ii<NDIM; ii++) 
-      os<< p[ii]<<" ";
+      if (ii==NDIM-1) 
+          os<< p[ii];
+      else{
+        os<< p[ii]<<",";}
+  os << ')';
   return os;
 }
 
