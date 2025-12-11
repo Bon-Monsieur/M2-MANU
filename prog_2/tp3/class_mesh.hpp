@@ -5,6 +5,7 @@
 #include "class_point.hpp"
 #include <vector>
 #include <string>
+#include <fstream> // pour ouvrir les fichiers
 
 template<class T>
 class mesh : public linked_list<T>{
@@ -30,3 +31,17 @@ int mesh<T>::indexing(){
     return count;
 } 
 
+bool mesh_reader_(std::string const& fname, std::vector<vertex*>& vertices , std::vector<triangle>& triangles ){
+    std::ifstream fichier(fname);  // ouverture du fichier
+
+    if (!fichier.is_open()) {
+        std::cerr << "Erreur : impossible d'ouvrir le fichier !" << std::endl;
+        return false;
+    }
+
+    
+
+
+
+    return true;
+}
