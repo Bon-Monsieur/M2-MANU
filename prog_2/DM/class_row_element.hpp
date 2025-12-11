@@ -1,7 +1,4 @@
 #pragma once 
-#include "header/class_dynamic_vector.hpp"
-#include "header/class_linked_list.hpp"
-#include "header/class_list.hpp"
 
 
 template<typename T>
@@ -172,4 +169,11 @@ const row_element<T> operator/(row_element<T> const& e, T const& t){
 template<typename T>
 void print(const row_element<T>& re){
     std::cout << "(val: " << re.get_value() << ", col: " << re.get_column() << ") ";
+}
+
+template <typename T>
+std::ostream& operator<<(std::ostream& os, const row_element<T>& re)
+{
+    os << "(val: " << re.get_value() << ", col: " << re.get_column() << ") ";
+    return os;
 }

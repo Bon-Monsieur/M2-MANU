@@ -9,7 +9,7 @@ protected:
     linked_list* p_next_;
 
 public:
-    inline T item() const { return item_; };
+    inline T const& item() const { return item_; };
     inline T& item() { return item_; };
     inline linked_list* p_next() const { return p_next_; };
     inline linked_list*& p_next() { return p_next_; };
