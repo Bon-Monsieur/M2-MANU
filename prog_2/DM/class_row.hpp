@@ -9,10 +9,47 @@ template<typename T>
 class row : public linked_list<row_element<T>> {
     public:
         // constructors
-        row(T const& val, int col) : linked_list<row_element<T>>(row_element<T>(val, col)) {};
+        row(T const& val = 0, int col = -1) : linked_list<row_element<T>>(row_element<T>(val, col)){};
         
-        // get first element
-        inline row_element<T> const& operator()() const { return this->item();}
-        inline T const& value() const { return this->item().get_value(); }
+        inline row_element<T> const& operator()() const { return this->item_;}
+        inline T const& value() const { return this->item_.get_value();}
+        inline int column() const { return this->item_.get_column();}
 
+        void insert_next_item(T const& val , int col );
+        void insert_first_item(T const& val , int col );
+        void append(T const& val , int col );
+
+        const T row_sum() const;
 };
+
+
+template<typename T>
+void row<T>::insert_next_item(T const& val , int col ){
+    row_element<T> e(val, col);
+    linked_list<row_element<T>>::insert_next_item(e);
+}
+
+template<typename T>
+void row<T>::insert_first_item(T const& val , int col ){
+    row_element<T> e(val, col);
+    linked_list<row_element<T>>::insert_first_item(e);
+}
+
+template<typename T>
+void row<T>::append(T const& val , int col ){
+    row_element<T> e(val, col);
+    linked_list<row_element<T>>::append(e);
+}
+
+
+template<typename T>
+const T row<T>::row_sum() const {
+    T sum = this->item_.get_value();
+
+    // si y'a un élément 
+    if (this->p_next_) {
+        sum += ((row*)this->p_next_)->row_sum();
+    }
+
+    return sum;
+}

@@ -13,8 +13,8 @@ class row_element{
         row_element<T>& operator=(const row_element<T>& other);
 
         // getters and setters
-        inline T get_value() const { return value_;}
-        inline int get_column() const { return column_;}
+        inline T const& get_value() const { return value_; }
+        inline int const& get_column() const { return column_;}
         inline void set_value(T value){ value_ = value;}
         inline void set_column(int column){ column_ = column;}
 
