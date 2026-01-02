@@ -82,12 +82,18 @@ row_element<T>& row_element<T>::operator*=(const row_element<T>& other){
 
 template<typename T>
 row_element<T>& row_element<T>::operator/=(T value){
+    if (value == 0){
+        throw std::runtime_error("Error: division by zero");
+    }
     this->set_value(this->get_value() / value);
     return *this;
 }
 
 template<typename T>
 row_element<T>& row_element<T>::operator/=(const row_element<T>& other){
+    if (other.get_value() == 0){
+        throw std::runtime_error("Error: division by zero");
+    }
     this->set_value(this->get_value() / other.get_value());
     return *this;
 }
@@ -161,6 +167,9 @@ const row_element<T> operator*(T const& t , row_element<T> const& e){
 template<typename T>
 const row_element<T> operator/(row_element<T> const& e, T const& t){
     row_element<T> res = e;
+    if (t == 0){
+        throw std::runtime_error("Error: division by zero");
+    }
     res /= t;
     return res;
 }
