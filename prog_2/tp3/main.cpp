@@ -9,6 +9,7 @@
 
 
 int main(){
+    /* POUR TESTER TOUTES LES CLASSES
     vertex* a = new vertex(point2d(1.,1.));
     vertex* b = new vertex(point2d(2.,2.));
     vertex* c = new vertex(point2d(2.,0.));
@@ -39,8 +40,11 @@ int main(){
     t2.print_vertices_indices();
     std::cout << "indices t3: " << std::endl;
     t3.print_vertices_indices();
+    */
     
-
-
+    std::vector<vertex*> vertices;
+    std::vector<triangle> triangles;
+    mesh_reader_("first.mesh",vertices,triangles);
+    std::cout << "Read " << vertices.size() << " vertices and " << triangles.size() << " triangles." << std::endl;
     return 0;
 }
