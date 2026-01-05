@@ -3,18 +3,19 @@
 #include "class_row.hpp"
 
 int main() {
-    row<double> row1(5.0, 2);
-    row1.insert_first_item(3.0, 0);
-    row1.insert_next_item(1.0, 1);
-    row1.append(4.0, 3);
+    row<double> row1(1.0, 0);
+    row1.append(3.0, 2);
+    row1.append(5.0, 4);
+    row1.append(7.0, 6);
     
-
+    
+    row<double> row2(2.0, 1);
+    row2.append(4.0, 3);
+    row2.append(6.0, 4);
+    row2.append(8.0, 5);
+    
+    row1+=row2;
     print(row1);
-    for (int i = 0; i <= 4; ++i) {
-        std::cout << "col " << i << " = " << row1[i] << std::endl;
-    }
-    
-    
 
     return 0;
 }

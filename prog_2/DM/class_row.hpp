@@ -1,7 +1,7 @@
 #pragma once
 #include "header/class_linked_list.hpp"
 #include "class_row_element.hpp"
-
+#include "header/class_dynamic_vector.hpp"  
 
 
 
@@ -19,10 +19,19 @@ class row : public linked_list<row_element<T>> {
         void insert_first_item(T const& val , int col );
         void append(T const& val , int col );
 
-        const T row_sum() const;
+        const T row_sum() const;    // somme des éléments de la ligne
 
-        const T operator[](int ii) const;
+        const T operator[](int ii) const; // accès à l'élément de la colonne ii (0 si inexistant)
+
+        const row& operator*=(T const& t );
+        const row& operator/=(T const& t );
+
+        // produit scalaire entre row et dynamic_vector pour la multiplication matricielle plus tard
+        const T operator*(dynamic_vector<T> const& v) const; 
+
+        void renumber_columns(dynamic_vector<int> const& renumber);
 };
+
 
 
 template<typename T>
@@ -69,4 +78,57 @@ const T row<T>::operator[](int ii) const {
         return ((row*)this->p_next_)->operator[](ii);
     }
     return 0;
+}
+
+
+template<typename T>
+const row<T>& row<T>::operator*=(T const& t ){
+    this->item_.set_value( this->item_.get_value() * t );
+
+    if (this->p_next_) {
+        ((row*)this->p_next_)->operator*=(t);
+    }
+
+    return *this;
+}
+
+template<typename T>
+const row<T>& row<T>::operator/=(T const& t ){
+    if (t == T{}) {
+        throw std::runtime_error("Division by zero in row operator/=");
+    }
+    else{
+        this->item_.set_value( this->item_.get_value() / t );
+
+    if (this->p_next_) {
+        ((row*)this->p_next_)->operator/=(t);
+    }
+    }
+    return *this;
+}
+
+
+template<typename T>
+const T row<T>::operator*(dynamic_vector<T> const& v) const {
+    T res = T{};
+
+    for (row<T> const* p = this; p != nullptr; p = (row<T> const*)p->p_next()) {
+        res += p->value() * v[p->column()];
+    }
+
+    return res;
+}
+
+
+template<typename T>
+void row<T>::renumber_columns(dynamic_vector<int> const& renumber) {
+    // ancienne colonne
+    int old_col = this->item_.get_column();
+
+    // nouvelle colonne
+    this->item_.set_column(renumber[old_col]);
+
+    if (this->p_next_) {
+        ((row*)this->p_next_)->renumber_columns(renumber);
+    }
 }
