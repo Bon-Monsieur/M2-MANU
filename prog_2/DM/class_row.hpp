@@ -30,6 +30,15 @@ class row : public linked_list<row_element<T>> {
         const T operator*(dynamic_vector<T> const& v) const; 
 
         void renumber_columns(dynamic_vector<int> const& renumber);
+
+        template<typename S>
+        friend const row<S> operator*(row<S> const& r , S const& t );
+        template<typename S>
+        friend const row<S> operator*(S const& t , row<S> const& r );
+        template<typename S>
+        friend const row<S> operator/(row<S> const& r , S const& t );
+
+        void drop_items(dynamic_vector<int> const& mask);
 };
 
 
@@ -100,9 +109,9 @@ const row<T>& row<T>::operator/=(T const& t ){
     else{
         this->item_.set_value( this->item_.get_value() / t );
 
-    if (this->p_next_) {
-        ((row*)this->p_next_)->operator/=(t);
-    }
+        if (this->p_next_) {
+            ((row*)this->p_next_)->operator/=(t);
+        }
     }
     return *this;
 }
@@ -130,5 +139,46 @@ void row<T>::renumber_columns(dynamic_vector<int> const& renumber) {
 
     if (this->p_next_) {
         ((row*)this->p_next_)->renumber_columns(renumber);
+    }
+}
+
+
+template<typename S>
+const row<S> operator*(row<S> const& r , S const& t ){
+    row<S> res(r);
+    res *= t;
+    return res;
+}
+
+template<typename S>
+const row<S> operator*(S const& t , row<S> const& r ) {
+    return r * t;
+}
+
+template<typename S>
+const row<S> operator/(row<S> const& r , S const& t ) {
+    row<S> res(r);
+    res /= t;
+    return res;
+}
+
+
+template<class T>
+void row<T>::drop_items(dynamic_vector<int> const& mask)
+{
+    // Cas de la liste suivante
+    if (this->p_next()) {
+        row<T>* next = (row<T>*)this->p_next();  // cast sûr, p_next_ est toujours un row
+        if (!mask[next->column()]) {
+            this->drop_next_item();
+            drop_items(mask); // on continue sur le même élément
+        } else {
+            next->drop_items(mask); // on descend récursivement
+        }
+    }
+
+    // Vérification du premier élément
+    if (!mask[this->column()]) {
+        this->drop_first_item();
     }
 }
