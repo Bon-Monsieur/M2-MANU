@@ -20,6 +20,8 @@ class row : public linked_list<row_element<T>> {
         void append(T const& val , int col );
 
         const T row_sum() const;
+
+        const T operator[](int ii) const;
 };
 
 
@@ -52,4 +54,19 @@ const T row<T>::row_sum() const {
     }
 
     return sum;
+}
+
+
+template<typename T>
+const T row<T>::operator[](int ii) const {
+    T temp = this->column();
+    if (temp == ii) {
+        return this->value();
+    } else if (temp > ii || this->p_next_ == nullptr) {
+        return 0;
+    }
+    else{
+        return ((row*)this->p_next_)->operator[](ii);
+    }
+    return 0;
 }
