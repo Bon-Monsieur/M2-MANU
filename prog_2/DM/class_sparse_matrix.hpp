@@ -22,6 +22,31 @@ class sparse_matrix : public list<row<T>>{
         int column_number() const;
         int order () const;
 
+        const sparse_matrix& operator+=(sparse_matrix<T> const&);
+        const sparse_matrix& operator-=(sparse_matrix<T> const&);
+        const sparse_matrix& operator*=(T const&);
+
+        // Opérateurs matriciels classiques
+        template<class S>
+        friend const sparse_matrix<S> operator+(sparse_matrix<S> const& M1, sparse_matrix<S> const& M2);
+        template<class S>
+        friend const sparse_matrix<S> operator-(sparse_matrix<S> const& M1, sparse_matrix<S> const& M2);
+        template<class S>
+        friend const sparse_matrix<S> operator*(sparse_matrix<S> const& M, const S& t );
+        template<class S>
+        friend const sparse_matrix<S> operator*(const S& t , sparse_matrix<S> const& M);
+        template<class S>
+        friend const dynamic_vector<S> operator*(sparse_matrix<S> const& M, dynamic_vector<S> const& v);
+        template<class S>
+        friend const sparse_matrix<S> operator*(sparse_matrix<S> const&, sparse_matrix<S> const&);
+        template<class S>
+        friend const sparse_matrix<S> transpose(sparse_matrix<S> const& M);
+        
+        template<class S>
+        friend void print(sparse_matrix<S> const& M);
+        
+        template<class S>
+        friend void printf(sparse_matrix<S> const& M, std::ofstream& os);
 
 };
 
@@ -72,13 +97,16 @@ sparse_matrix<T>::sparse_matrix(std::string const& filename) : list<row<T>>(0)
 
 template<class T>
 const T sparse_matrix<T>::operator()(int i, int j){
-    row<T>& r = this->item(i);
-    if (r[j] != 0){
-        return r[j];
-    } else {
-        throw std::runtime_error("L'élément est nul dans la matrice creuse.");
+    row<T>* r = this->item(i);
+    if (!r) return T(0);
+
+    T val = (*r)[j];
+    if (val != T(0)){
+        return val;
     }
+    throw std::runtime_error("Element nul dans la matrice creuse");
 }
+
 
 template<class T>
 int sparse_matrix<T>::row_number() const {
@@ -90,21 +118,18 @@ int sparse_matrix<T>::column_number() const {
     int max_col = -1;
 
     for (int i = 0; i < this->number(); ++i) {
+        row<T>* r = this->item(i);
+        if (!r) continue;
 
-        row<T> const* p = this->item(i);
-        if (!p) continue;   // ligne vide
-
-        // Parcours récursif/itératif de la row
-        while (p) {
-            int col = p->column();
-            if (col > max_col){
-                max_col = col;
-            }
-            p = (row<T> const*)p->p_next();
+        linked_list<row_element<T>>* e = r->p_first();
+        while (e) {
+            int col = e->item().get_column();
+            if (col > max_col) max_col = col;
+            e = e->p_next();
         }
     }
 
-    return max_col + 1; // indices commencent à 0
+    return max_col + 1;
 }
 
 
@@ -112,4 +137,187 @@ int sparse_matrix<T>::column_number() const {
 template<class T>   
 int sparse_matrix<T>::order () const {
     return max(this->row_number(), this->column_number());
+}
+
+
+template<class T>
+const sparse_matrix<T>& sparse_matrix<T>::operator+=(sparse_matrix<T> const& other){
+    if (row_number() != other.row_number())
+        throw std::runtime_error("Nombre de lignes différent");
+
+    for (int i = 0; i < row_number(); ++i){
+        if (!this->item(i))
+            this->item(i) = new row<T>();
+
+        *(this->item(i)) += *(other.item(i));
+    }
+    return *this;
+}
+
+template<class T>
+const sparse_matrix<T>& sparse_matrix<T>::operator-=(sparse_matrix<T> const& other){
+    if (row_number() != other.row_number())
+        throw std::runtime_error("Nombre de lignes différent");
+
+    for (int i = 0; i < row_number(); ++i){
+        if (!this->item(i))
+            this->item(i) = new row<T>();
+
+        *(this->item(i)) -= *(other.item(i));
+    }
+    return *this;
+}
+
+template<class T>
+const sparse_matrix<T>& sparse_matrix<T>::operator*=(T const& scalar){
+    for (int i = 0; i < row_number(); ++i){
+        if (this->item(i))
+            *(this->item(i)) *= scalar;
+    }
+    return *this;
+}
+
+
+
+template<class S>
+const sparse_matrix<S> operator+(sparse_matrix<S> const& M1, sparse_matrix<S> const& M2){
+    sparse_matrix<S> temp = M1;
+    temp += M2;
+    return temp;
+}
+
+template<class S>
+const sparse_matrix<S> operator-(sparse_matrix<S> const& M1, sparse_matrix<S> const& M2){
+    sparse_matrix<S> temp = M1;
+    temp -= M2;
+    return temp;
+}
+
+template<class S>
+const sparse_matrix<S> operator*(sparse_matrix<S> const& M, const S& t ){
+    sparse_matrix<S> temp = M;
+    temp *= t;
+    return temp;
+}
+
+template<class S>
+const sparse_matrix<S> operator*(const S& t , sparse_matrix<S> const& M){
+    sparse_matrix<S> temp = M;
+    temp *= t;
+    return temp;
+}
+
+
+template<class S>
+const dynamic_vector<S> operator*(sparse_matrix<S> const& M, dynamic_vector<S> const& v){
+    if (M.column_number() != v.size())
+        throw std::runtime_error("Dimensions mauvaises");
+
+    dynamic_vector<S> result(M.row_number(), 0);
+
+    for (int i = 0; i < M.row_number(); ++i){
+        row<S>* r = M.item(i);
+        linked_list<row_element<S>>* e = r->p_first();
+        while (e){
+            int col = e->item().get_column();
+            S val = e->item().get_value();
+            result(i) += val * v(col);
+            e = e->p_next();
+        }
+    }
+
+    return result;
+}
+
+
+
+template<class S>
+const sparse_matrix<S> operator*(sparse_matrix<S> const& B, sparse_matrix<S> const& A)
+{
+    if (B.column_number() != A.row_number()) {
+        throw std::runtime_error("Dimensions incompatibles pour le produit matriciel");
+    }
+
+    sparse_matrix<S> result(B.row_number());
+
+    for (int i = 0; i < B.row_number(); ++i) {
+
+        // ligne résultat i = combinaison linéaire de la ligne A_i
+        row<S>* res_row = new row<S>();
+
+        row<S> const* b_row = B.item(i);
+
+        while (b_row) {
+            int j   = b_row->column();  // indice de colonne dans B
+            S coef  = b_row->value();   // coefficient B(i,j)
+
+            // Ajouter coef * A_i à la ligne résultat
+            row<S> temp = *(A.item(i)); // copie de la ligne i de A
+            temp *= coef;
+            *res_row += temp;
+
+            b_row = (row<S> const*) b_row->p_next();
+        }
+
+        result.item(i) = res_row;
+    }
+
+    return result;
+}
+
+
+
+template<class S>
+const sparse_matrix<S> transpose(sparse_matrix<S> const& M){
+    sparse_matrix<S> T(M.column_number());
+
+    for (int i = 0; i < M.row_number(); ++i){
+        row<S> const* r = M.item(i);
+        while (r){
+            int j = r->column();
+            S v = r->value();
+
+            if (!T.item(j))
+                T.item(j) = new row<S>(v, i);
+            else
+                T.item(j)->append(v, i);
+
+            r = r->p_next();
+        }
+    }
+    return T;
+}
+
+
+template<class S>
+void print(sparse_matrix<S> const& M){
+    std::cout << "Sparse Matrix (" << M.row_number() << " x " << M.column_number() << "):" << std::endl;
+    
+    for (int i = 0; i < M.row_number(); ++i){
+        row<S> const* r = M.item(i);
+        while (r){
+            int col = r->column();
+            S val = r->value();
+            
+            std::cout << "M[" << i << "][" << col << "] = " << val << std::endl;
+            
+            r = (row<S> const*)r->p_next();
+        }
+    }
+}
+
+
+template<class S>
+void printf(sparse_matrix<S> const& M, std::ofstream& os){
+    for (int i = 0; i < M.row_number(); ++i){
+        row<S> const* r = M.item(i);
+        while (r){
+            int col = r->column();
+            S val = r->value();
+            
+            os << i << " " << col << " " << val << std::endl;
+            
+            r = (row<S> const*)r->p_next();
+        }
+    }
 }
