@@ -177,3 +177,6 @@ void mesh<T>::build_edges(std::vector<edge>& edges, std::size_t n_vertices){
 
     }
 }
+
+
+// ecrire fonction qui créer un fichier avec les coordonnées des sommets version brut-force
