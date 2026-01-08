@@ -34,7 +34,7 @@ public:
 
     //Declaration des methodes rajoutees
     inline int index() const { return index_;};
-    inline void set_index(int ind){ index_ = ind;}
+    inline void set_index(int ind){ index_ = ind;};
 
 };
 
