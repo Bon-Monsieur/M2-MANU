@@ -121,14 +121,12 @@ int sparse_matrix<T>::column_number() const {
         row<T>* r = this->item(i);
         if (!r) continue;
 
-        linked_list<row_element<T>>* e = r->p_first();
-        while (e) {
-            int col = e->item().get_column();
-            if (col > max_col) max_col = col;
-            e = e->p_next();
+        for (row<T> const* p = r; p != nullptr; p = (row<T> const*)p->p_next()) {
+            if (p->column() > max_col){
+                max_col = p->column();
+            }
         }
     }
-
     return max_col + 1;
 }
 
