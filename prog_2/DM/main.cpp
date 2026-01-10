@@ -130,6 +130,14 @@ int main(){
     sparse_matrix<double> matTransposed = transpose(MatMain);
     print(matTransposed);
     std::cout << std::endl;
+
+    // Test 15: Diagonal extraction
+    std::cout << "Test 15: Diagonal Extraction" << std::endl;
+    sparse_matrix<double> matDiagonal = diagonal(MatMain);
+    std::cout << "Diagonal of MatMain:" << std::endl;
+    print(matDiagonal);
+    std::cout << std::endl;
+
 /*
     // Test 16: printf function (write to file)
     std::cout << "Test 16: Printf Function (write to file)" << std::endl;

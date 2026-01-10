@@ -41,6 +41,8 @@ class sparse_matrix : public list<row<T>>{
         friend const sparse_matrix<S> operator*(sparse_matrix<S> const&, sparse_matrix<S> const&);
         template<class S>
         friend const sparse_matrix<S> transpose(sparse_matrix<S> const& M);
+        template<class S>
+        friend const sparse_matrix<S> diagonal(sparse_matrix<S> const& M);
         
         template<class S>
         friend void print(sparse_matrix<S> const& M);
@@ -290,6 +292,25 @@ const sparse_matrix<S> transpose(sparse_matrix<S> const& M){
     }
     return T;
 }
+
+
+template<class S>
+const sparse_matrix<S> diagonal(sparse_matrix<S> const& M){
+    int N = M.order();
+    sparse_matrix<S> D(N);
+
+    for (int i = 0; i < N; ++i){
+        row<S> const* r = M.item(i);
+        if (!r) continue;
+
+        S diag_value = (*r)[i];
+        if (diag_value != S(0)){
+            D.item(i) = new row<S>(diag_value, i);
+        }
+    }
+    return D;
+}
+
 
 
 template<class S>
