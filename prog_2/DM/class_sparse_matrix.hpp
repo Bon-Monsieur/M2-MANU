@@ -137,17 +137,17 @@ int sparse_matrix<T>::order () const {
     return max(this->row_number(), this->column_number());
 }
 
-/*
+
 template<class T>
 const sparse_matrix<T>& sparse_matrix<T>::operator+=(sparse_matrix<T> const& other){
     if (row_number() != other.row_number())
         throw std::runtime_error("Nombre de lignes différent");
 
-    for (int i = 0; i < row_number(); ++i){
-        if (!this->item(i))
-            this->item(i) = new row<T>();
+    for (int ii = 0; ii < row_number(); ++ii){
+        if (!this->item(ii))
+            this->item(ii) = new row<T>();
 
-        *(this->item(i)) += *(other.item(i));
+        *(this->item(ii)) += *(other.item(ii));
     }
     return *this;
 }
@@ -157,12 +157,10 @@ const sparse_matrix<T>& sparse_matrix<T>::operator-=(sparse_matrix<T> const& oth
     if (row_number() != other.row_number())
         throw std::runtime_error("Nombre de lignes différent");
 
-    for (int i = 0; i < row_number(); ++i){
-        if (!this->item(i))
-            this->item(i) = new row<T>();
-
-        *(this->item(i)) -= *(other.item(i));
-    }
+    sparse_matrix<T> temp = other;
+    temp*=-1;
+    *(this) += temp;
+    
     return *this;
 }
 
@@ -228,7 +226,7 @@ const dynamic_vector<S> operator*(sparse_matrix<S> const& M, dynamic_vector<S> c
 }
 
 
-
+/*
 template<class S>
 const sparse_matrix<S> operator*(sparse_matrix<S> const& B, sparse_matrix<S> const& A)
 {
@@ -304,7 +302,7 @@ void print(sparse_matrix<S> const& M){
     }
 }
 
-/*
+
 template<class S>
 void printf(sparse_matrix<S> const& M, std::ofstream& os){
     for (int i = 0; i < M.row_number(); ++i){
@@ -319,4 +317,3 @@ void printf(sparse_matrix<S> const& M, std::ofstream& os){
         }
     }
 }
-*/
