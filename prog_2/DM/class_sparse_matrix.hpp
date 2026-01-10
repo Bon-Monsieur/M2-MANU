@@ -205,25 +205,27 @@ const sparse_matrix<S> operator*(const S& t , sparse_matrix<S> const& M){
 
 
 template<class S>
-const dynamic_vector<S> operator*(sparse_matrix<S> const& M, dynamic_vector<S> const& v){
+const dynamic_vector<S> operator*(sparse_matrix<S> const& M, dynamic_vector<S> const& v)
+{
     if (M.column_number() != v.size())
-        throw std::runtime_error("Dimensions mauvaises");
+        throw std::runtime_error("Dimensions incompatibles M x v");
 
-    dynamic_vector<S> result(M.row_number(), 0);
+    dynamic_vector<S> result(M.row_number(), S(0));
 
-    for (int i = 0; i < M.row_number(); ++i){
-        row<S>* r = M.item(i);
-        linked_list<row_element<S>>* e = r->p_first();
-        while (e){
-            int col = e->item().get_column();
-            S val = e->item().get_value();
-            result(i) += val * v(col);
-            e = e->p_next();
+    for (int ii = 0; ii < M.row_number(); ++ii) {
+        row<S>* r = M.item(ii);
+        if (!r) continue;
+
+        for (row<S> const* p = r; p != nullptr; p = (row<S> const*)p->p_next()) {
+            size_t col = p->item().get_column();
+            S val   = p->item().get_value();
+            result(ii) += val * v[col];
         }
     }
 
     return result;
 }
+
 
 
 /*

@@ -85,7 +85,7 @@ int main(){
     std::cout << "matB -= matA:" << std::endl;
     print(matD);
     std::cout << std::endl;
-/*
+
     // Test 12: Matrix-Vector multiplication
     std::cout << "Test 12: Matrix-Vector Multiplication" << std::endl;
     sparse_matrix<double> matMV(3, 2.0);
@@ -93,11 +93,9 @@ int main(){
     dynamic_vector<double> result = matMV * vec;
     std::cout << "Matrix (3x3, diag=2.0) * Vector (size 3, all 1.0):" << std::endl;
     std::cout << "Result size: " << result.size() << std::endl;
-    for (int i = 0; i < result.size(); ++i) {
-        std::cout << "result(" << i << ") = " << result(i) << std::endl;
-    }
+    std::cout << result;
     std::cout << std::endl;
-
+/*
     // Test 13: Matrix-Matrix multiplication
     std::cout << "Test 13: Matrix-Matrix Multiplication" << std::endl;
     sparse_matrix<double> matX(2, 1.0);
