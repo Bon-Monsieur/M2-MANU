@@ -22,6 +22,23 @@ int main(){
     print(mat2);
     std::cout << std::endl;
 
+
+    // TEST 3 : MATRICE A LA MAIN
+    // Création d'une matrice 2x2 vide
+    sparse_matrix<double> MatMain(2);
+
+    // Ligne 0 : (1, 2)
+    MatMain.item(0) = new row<double>(0.0, 0); // M(0,0) = 0
+    MatMain.item(0)->append(2.0, 1);  // M(0,1) = 2
+
+    // Ligne 1 : (3, 4)
+    MatMain.item(1) = new row<double>(2.0, 0); // M(1,0) = 2
+    MatMain.item(1)->append(0.0, 1);  // M(1,1) = 0
+
+    // Affichage
+    print(MatMain);
+
+
     // Test 4: operator() - element access
     std::cout << "Test 4: Element Access operator()" << std::endl;
     try {
@@ -34,7 +51,7 @@ int main(){
 
     // Test 5: Scalar multiplication (operator*)
     std::cout << "Test 5: Scalar Multiplication" << std::endl;
-    sparse_matrix<double> mat4 = mat2 * 3.0;
+    sparse_matrix<double> mat4 = MatMain * 3.0;
     std::cout << "mat2 * 3.0:" << std::endl;
     print(mat4);
     std::cout << std::endl;
@@ -89,22 +106,23 @@ int main(){
     // Test 12: Matrix-Vector multiplication
     std::cout << "Test 12: Matrix-Vector Multiplication" << std::endl;
     sparse_matrix<double> matMV(3, 2.0);
-    dynamic_vector<double> vec(3, 1.0);
-    dynamic_vector<double> result = matMV * vec;
+    dynamic_vector<double> vec(2, 1.0);
+    dynamic_vector<double> result = MatMain * vec;
     std::cout << "Matrix (3x3, diag=2.0) * Vector (size 3, all 1.0):" << std::endl;
     std::cout << "Result size: " << result.size() << std::endl;
     std::cout << result;
     std::cout << std::endl;
-/*
+
     // Test 13: Matrix-Matrix multiplication
     std::cout << "Test 13: Matrix-Matrix Multiplication" << std::endl;
-    sparse_matrix<double> matX(2, 1.0);
+    sparse_matrix<double> matX(2, 6.0);
     sparse_matrix<double> matY(2, 2.0);
-    sparse_matrix<double> matProd = matX * matY;
-    std::cout << "Matrix X (2x2, diag=1.0) * Matrix Y (2x2, diag=2.0):" << std::endl;
+    
+    sparse_matrix<double> matProd = MatMain * matY;
+    std::cout << "Matrix MatMain (2x2, 1,2,3,4) * Matrix Y (2x2, diag=2.0):" << std::endl;
     print(matProd);
     std::cout << std::endl;
-
+/*
     // Test 14: Transpose
     std::cout << "Test 14: Transpose" << std::endl;
     sparse_matrix<double> matToTranspose(2);
@@ -120,12 +138,6 @@ int main(){
     std::cout << "\nTransposed matrix:" << std::endl;
     sparse_matrix<double> matTransposed = transpose(matToTranspose);
     print(matTransposed);
-    std::cout << std::endl;
-
-    // Test 15: print function
-    std::cout << "Test 15: Print Function" << std::endl;
-    std::cout << "Printing matrix with 5 rows:" << std::endl;
-    print(mat2);
     std::cout << std::endl;
 
     // Test 16: printf function (write to file)

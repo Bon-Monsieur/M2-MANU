@@ -227,8 +227,6 @@ const dynamic_vector<S> operator*(sparse_matrix<S> const& M, dynamic_vector<S> c
 }
 
 
-
-/*
 template<class S>
 const sparse_matrix<S> operator*(sparse_matrix<S> const& B, sparse_matrix<S> const& A)
 {
@@ -240,21 +238,28 @@ const sparse_matrix<S> operator*(sparse_matrix<S> const& B, sparse_matrix<S> con
 
     for (int i = 0; i < B.row_number(); ++i) {
 
-        // ligne résultat i = combinaison linéaire de la ligne A_i
-        row<S>* res_row = new row<S>();
+        row<S>* res_row = nullptr;
 
         row<S> const* b_row = B.item(i);
+        if (!b_row) continue;
 
-        while (b_row) {
-            int j   = b_row->column();  // indice de colonne dans B
-            S coef  = b_row->value();   // coefficient B(i,j)
+        for (row<S> const* p = b_row; p != nullptr;
+             p = (row<S> const*) p->p_next()) {
 
-            // Ajouter coef * A_i à la ligne résultat
-            row<S> temp = *(A.item(i)); // copie de la ligne i de A
-            temp *= coef;
-            *res_row += temp;
+            int j  = p->column();   // colonne j de B
+            S coef = p->value();    // B(i,j)
 
-            b_row = (row<S> const*) b_row->p_next();
+            row<S>* a_row = A.item(j);
+            if (!a_row) continue;
+
+            row<S> temp = *a_row;  // copie de A_j
+            temp *= coef;          // coef * A_j
+
+            if (!res_row) {
+                res_row = new row<S>(temp);  // première contribution
+            } else {
+                *res_row += temp;
+            }
         }
 
         result.item(i) = res_row;
@@ -265,6 +270,7 @@ const sparse_matrix<S> operator*(sparse_matrix<S> const& B, sparse_matrix<S> con
 
 
 
+/*
 template<class S>
 const sparse_matrix<S> transpose(sparse_matrix<S> const& M){
     sparse_matrix<S> T(M.column_number());
