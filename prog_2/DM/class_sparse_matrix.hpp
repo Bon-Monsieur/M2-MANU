@@ -270,29 +270,28 @@ const sparse_matrix<S> operator*(sparse_matrix<S> const& B, sparse_matrix<S> con
 
 
 
-/*
+
 template<class S>
 const sparse_matrix<S> transpose(sparse_matrix<S> const& M){
     sparse_matrix<S> T(M.column_number());
 
     for (int i = 0; i < M.row_number(); ++i){
         row<S> const* r = M.item(i);
-        while (r){
-            int j = r->column();
-            S v = r->value();
+        
+        for (row<S> const* p = r; p != nullptr; p = (row<S> const*) p->p_next()){
+            int j = p->column();
+            S v = p->value();
 
             if (!T.item(j))
                 T.item(j) = new row<S>(v, i);
             else
                 T.item(j)->append(v, i);
-
-            r = r->p_next();
         }
     }
     return T;
 }
 
-*/
+
 template<class S>
 void print(sparse_matrix<S> const& M){
     std::cout << "Sparse Matrix (" << M.row_number() << " x " << M.column_number() << "):" << std::endl;

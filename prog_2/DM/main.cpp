@@ -28,12 +28,12 @@ int main(){
     sparse_matrix<double> MatMain(2);
 
     // Ligne 0 : (1, 2)
-    MatMain.item(0) = new row<double>(0.0, 0); // M(0,0) = 0
+    MatMain.item(0) = new row<double>(1.0, 0); // M(0,0) = 1
     MatMain.item(0)->append(2.0, 1);  // M(0,1) = 2
 
     // Ligne 1 : (3, 4)
-    MatMain.item(1) = new row<double>(2.0, 0); // M(1,0) = 2
-    MatMain.item(1)->append(0.0, 1);  // M(1,1) = 0
+    MatMain.item(1) = new row<double>(3.0, 0); // M(1,0) = 3
+    MatMain.item(1)->append(4.0, 1);  // M(1,1) = 4
 
     // Affichage
     print(MatMain);
@@ -122,24 +122,15 @@ int main(){
     std::cout << "Matrix MatMain (2x2, 1,2,3,4) * Matrix Y (2x2, diag=2.0):" << std::endl;
     print(matProd);
     std::cout << std::endl;
-/*
-    // Test 14: Transpose
-    std::cout << "Test 14: Transpose" << std::endl;
-    sparse_matrix<double> matToTranspose(2);
-    row<double> r0t(1.0, 0);
-    r0t.append(2.0, 1);
-    *matToTranspose.item(0) = r0t;
-    row<double> r1t(3.0, 0);
-    r1t.append(4.0, 1);
-    *matToTranspose.item(1) = r1t;
-    
-    std::cout << "Original matrix:" << std::endl;
-    print(matToTranspose);
+
+    // Test 14: Transpose    
+    std::cout << "Original matrix: MatMain" << std::endl;
+    print(MatMain);
     std::cout << "\nTransposed matrix:" << std::endl;
-    sparse_matrix<double> matTransposed = transpose(matToTranspose);
+    sparse_matrix<double> matTransposed = transpose(MatMain);
     print(matTransposed);
     std::cout << std::endl;
-
+/*
     // Test 16: printf function (write to file)
     std::cout << "Test 16: Printf Function (write to file)" << std::endl;
     std::ofstream outfile("sparse_matrix_output.txt");
@@ -152,8 +143,8 @@ int main(){
         std::cout << "Failed to open output file!" << std::endl;
     }
     std::cout << std::endl;
-
+*/
     std::cout << "==== All Tests Completed ====" << std::endl;
-    */
+    
     return 0;
 }
