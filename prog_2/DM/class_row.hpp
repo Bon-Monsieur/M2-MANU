@@ -168,7 +168,7 @@ void row<T>::drop_items(dynamic_vector<int> const& mask)
 {
     // Cas de la liste suivante
     if (this->p_next()) {
-        row<T>* next = (row<T>*)this->p_next();  // cast sûr, p_next_ est toujours un row
+        row<T>* next = (row<T>*)this->p_next();
         if (!mask[next->column()]) {
             this->drop_next_item();
             drop_items(mask); // on continue sur le même élément

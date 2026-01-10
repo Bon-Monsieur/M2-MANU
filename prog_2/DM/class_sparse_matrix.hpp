@@ -117,8 +117,8 @@ template<class T>
 int sparse_matrix<T>::column_number() const {
     int max_col = -1;
 
-    for (int i = 0; i < this->number(); ++i) {
-        row<T>* r = this->item(i);
+    for (int ii = 0; ii < this->number(); ++ii) {
+        row<T>* r = this->item(ii);
         if (!r) continue;
 
         for (row<T> const* p = r; p != nullptr; p = (row<T> const*)p->p_next()) {
@@ -137,7 +137,7 @@ int sparse_matrix<T>::order () const {
     return max(this->row_number(), this->column_number());
 }
 
-
+/*
 template<class T>
 const sparse_matrix<T>& sparse_matrix<T>::operator+=(sparse_matrix<T> const& other){
     if (row_number() != other.row_number())
@@ -286,7 +286,7 @@ const sparse_matrix<S> transpose(sparse_matrix<S> const& M){
     return T;
 }
 
-
+*/
 template<class S>
 void print(sparse_matrix<S> const& M){
     std::cout << "Sparse Matrix (" << M.row_number() << " x " << M.column_number() << "):" << std::endl;
@@ -304,7 +304,7 @@ void print(sparse_matrix<S> const& M){
     }
 }
 
-
+/*
 template<class S>
 void printf(sparse_matrix<S> const& M, std::ofstream& os){
     for (int i = 0; i < M.row_number(); ++i){
@@ -319,3 +319,4 @@ void printf(sparse_matrix<S> const& M, std::ofstream& os){
         }
     }
 }
+*/
