@@ -127,9 +127,9 @@ int main(){
 
     // Test 16: printf function (write to file)
     std::cout << "Test 16: Printf Function (write to file)" << std::endl;
-    std::ofstream outfile("sparse_matrix_output.txt");
+    std::ofstream outfile("MatMain1.txt");
     if (outfile.is_open()) {
-        std::cout << "Writing matrix to 'sparse_matrix_output.txt'..." << std::endl;
+        std::cout << "Writing matrix to 'MatMain1.txt'..." << std::endl;
         printf(MatMain1, outfile);
         outfile.close();
         std::cout << "File written successfully!" << std::endl;
