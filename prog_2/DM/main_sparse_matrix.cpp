@@ -138,6 +138,13 @@ int main(){
     }
     std::cout << std::endl;
 
+
+    //TEST 17 : CONSTRUCTEUR A PARTIR D'UN FICHIER
+    std::cout << "Test 17: Constructor from File" << std::endl;
+    sparse_matrix<double> matFromFile("MatMain1.txt");
+    print(matFromFile);
+    std::cout << std::endl;
+
     std::cout << "==== All Tests Completed ====" << std::endl;
     
     return 0;

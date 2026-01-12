@@ -14,7 +14,9 @@ class sparse_matrix : public list<row<T>>{
         sparse_matrix(int Nrows=0) : list<row<T>>(Nrows){}; // constructeur par défaut
         sparse_matrix(int Nrows, T const& a);   // initialisation de la diagonale
         
-        // construceur à parrtir d'un fichier comme Harwell-Boeing
+        // construceur à parrtir d'un fichier comme Harwell-Boeing 
+        // Je n'ai pas trouvé de format clair sur internet, donc j'ai fait une version simple qui permet de construire une matrice dans le même format 
+        // que celui généré par la fonction printf ci-dessous
         sparse_matrix(std::string const& filename);
 
         const T operator()(int i, int j);
@@ -63,38 +65,49 @@ sparse_matrix<T>::sparse_matrix(int Nrows, T const& a) : list<row<T>>(Nrows)
 }
 
 template<class T>
-sparse_matrix<T>::sparse_matrix(std::string const& filename) : list<row<T>>(0)
+sparse_matrix<T>::sparse_matrix(std::string const& filename)
+    : list<row<T>>(0)
 {
     std::ifstream file(filename);
     if (!file.is_open()) {
-        throw std::runtime_error("Impossible d'ouvrir le fichier" + filename);
+        throw std::runtime_error("Impossible d'ouvrir le fichier " + filename);
     }
 
     int Nrows, Ncols, nnz;
     file >> Nrows >> Ncols >> nnz;
 
-    // On crée Nrows lignes vides
-    for (int i = 0; i < Nrows; ++i) {
-        this->append(row<T>());  // ajoute une row vide
+    if (!file) {
+        throw std::runtime_error("Erreur de lecture de l'en-tête du fichier");
     }
 
-    // Lire les coefficients
-    int row_idx, col_idx;
-    T value;
+    // Création de Nrows lignes vides (nullptr)
+    this->number() = Nrows;
+    this->item_ = new row<T>*[Nrows];
+    for (int i = 0; i < Nrows; ++i) {
+        this->item(i) = nullptr;
+    }
+
+    // Lecture des coefficients
     for (int k = 0; k < nnz; ++k) {
-        file >> row_idx >> col_idx >> value;
+        int i, j;
+        T value;
+        file >> i >> j >> value;
 
-        // Les indices en Harwell-Boeing commencent à 1 donc on les ajuste
-        row_idx -= 1;
-        col_idx -= 1;
+        if (!file) {
+            throw std::runtime_error("Erreur de lecture d'un coefficient");
+        }
 
-        // On récupère la row correspondante et l'ajoute
-        row<T>& r = this->item(row_idx);
-        r.append(value, col_idx);
+        // Création de la row si elle n'existe pas encore
+        if (!this->item(i)) {
+            this->item(i) = new row<T>(value, j);
+        } else {
+            this->item(i)->append(value, j);
+        }
     }
 
     file.close();
 }
+
 
 
 template<class T>
@@ -334,20 +347,37 @@ void print(sparse_matrix<S> const& M){
 template<class S>
 void printf(sparse_matrix<S> const& M, std::ofstream& os)
 {
-    if (!os) {
-        throw std::runtime_error("Flux de sortie invalide");
+    if (!os.is_open()) {
+        throw std::runtime_error("Flux de sortie non ouvert dans printf");
     }
 
+    int nnz = 0;
+
+    // Comptage des coefficients non nuls
     for (int i = 0; i < M.row_number(); ++i) {
-
         row<S> const* r = M.item(i);
-        if (!r) continue;
+        for (row<S> const* p = r; p != nullptr;
+             p = (row<S> const*) p->p_next()) {
+            ++nnz;
+        }
+    }
 
-        for (row<S> const* p = r; p != nullptr; p = (row<S> const*) p->p_next())
-        {
+    // ===== En-tête =====
+    os << M.row_number() << " "
+       << M.column_number() << " "
+       << nnz << "\n";
+    
+    os << "\n";
+
+    // ===== Données =====
+    for (int i = 0; i < M.row_number(); ++i) {
+        row<S> const* r = M.item(i);
+        for (row<S> const* p = r; p != nullptr;
+             p = (row<S> const*) p->p_next()) {
+
             os << i << " "
-               << p->item().get_column() << " "
-               << p->item().get_value() << std::endl;
+               << p->column() << " "
+               << p->value() << "\n";
         }
     }
 }
