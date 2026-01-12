@@ -332,16 +332,22 @@ void print(sparse_matrix<S> const& M){
 
 
 template<class S>
-void printf(sparse_matrix<S> const& M, std::ofstream& os){
-    for (int i = 0; i < M.row_number(); ++i){
+void printf(sparse_matrix<S> const& M, std::ofstream& os)
+{
+    if (!os) {
+        throw std::runtime_error("Flux de sortie invalide");
+    }
+
+    for (int i = 0; i < M.row_number(); ++i) {
+
         row<S> const* r = M.item(i);
-        while (r){
-            int col = r->column();
-            S val = r->value();
-            
-            os << i << " " << col << " " << val << std::endl;
-            
-            r = (row<S> const*)r->p_next();
+        if (!r) continue;
+
+        for (row<S> const* p = r; p != nullptr; p = (row<S> const*) p->p_next())
+        {
+            os << i << " "
+               << p->item().get_column() << " "
+               << p->item().get_value() << std::endl;
         }
     }
 }
