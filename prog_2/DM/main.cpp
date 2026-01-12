@@ -24,134 +24,120 @@ int main(){
 
 
     // TEST 3 : MATRICE A LA MAIN
-    // Création d'une matrice 2x2 vide
-    sparse_matrix<double> MatMain(2);
+    std::cout << "Test 3: Construction matrices creuses à la main" << std::endl;
+    // [[1, 2, 0],
+    //  [0, 0, 3],
+    //  [0, 4, 0]]
+    sparse_matrix<double> MatMain1(3);
+    MatMain1.item(0) = new row<double>(1.0, 0); // M(0,0) = 1
+    MatMain1.item(0)->append(2.0, 1);  // M(0,1) = 2
+    MatMain1.item(1) = new row<double>(3.0, 2); // M(1,0) = 3
+    MatMain1.item(2)  = new row<double>(4.0, 1);  // M(1,1) = 4
+    std::cout << "MatMain1:" << std::endl;
+    print(MatMain1);
+    std::cout << std::endl;
 
-    // Ligne 0 : (1, 2)
-    MatMain.item(0) = new row<double>(1.0, 0); // M(0,0) = 1
-    MatMain.item(0)->append(2.0, 1);  // M(0,1) = 2
-
-    // Ligne 1 : (3, 4)
-    MatMain.item(1) = new row<double>(3.0, 0); // M(1,0) = 3
-    MatMain.item(1)->append(4.0, 1);  // M(1,1) = 4
-
-    // Affichage
-    print(MatMain);
-
-
-    // Test 4: operator() - element access
-    std::cout << "Test 4: Element Access operator()" << std::endl;
-    try {
-        double val = mat2(0, 0);
-        std::cout << "mat2(0,0) = " << val << std::endl;
-    } catch (const std::runtime_error& e) {
-        std::cout << "Error: " << e.what() << std::endl;
-    }
+    // [[0,0,5],
+    //  [6,0,0],
+    //  [0,7,0]]
+    sparse_matrix<double> MatMain2(3);
+    MatMain2.item(0) = new row<double>(5.0, 2); // M(0,2) = 5
+    MatMain2.item(1) = new row<double>(6.0, 0); // M(1,0) = 6
+    MatMain2.item(2) = new row<double>(7.0, 1); // M(2,1) = 7
+    std::cout << "MatMain2:" << std::endl;
+    print(MatMain2);
     std::cout << std::endl;
 
     // Test 5: Scalar multiplication (operator*)
     std::cout << "Test 5: Scalar Multiplication" << std::endl;
-    sparse_matrix<double> mat4 = MatMain * 3.0;
-    std::cout << "mat2 * 3.0:" << std::endl;
+    sparse_matrix<double> mat4 = MatMain1 * 3.0;
+    std::cout << "MatMain1 * 3.0:" << std::endl;
     print(mat4);
-    std::cout << std::endl;
-
-    // Test 6: Scalar multiplication (commutative)
-    std::cout << "Test 6: Commutative Scalar Multiplication" << std::endl;
-    sparse_matrix<double> mat5 = 2.0 * mat2;
-    std::cout << "2.0 * mat2:" << std::endl;
-    print(mat5);
     std::cout << std::endl;
 
     // Test 7: operator*= (in-place scalar multiplication)
     std::cout << "Test 7: In-place Scalar Multiplication (*=)" << std::endl;
-    sparse_matrix<double> mat6 = mat2;
+    sparse_matrix<double> mat6 = MatMain2;
     mat6 *= 0.5;
-    std::cout << "mat2 *= 0.5:" << std::endl;
+    std::cout << "MatMain2 *= 0.5:" << std::endl;
     print(mat6);
     std::cout << std::endl;
 
     // Test 8: Matrix addition (operator+)
     std::cout << "Test 8: Matrix Addition" << std::endl;
-    sparse_matrix<double> matA(3, 5.0);
-    sparse_matrix<double> matB(3, 4.0);
-    sparse_matrix<double> matSum = matA + matB;
-    std::cout << "Matrix A (3x3, diag=1.0) + Matrix B (3x3, diag=2.0):" << std::endl;
+    sparse_matrix<double> matSum = MatMain1 + MatMain2;
+    std::cout << "MatMain1 + MatMain2:" << std::endl;
     print(matSum);
     std::cout << std::endl;
 
     // Test 9: operator+= (in-place addition)
     std::cout << "Test 9: In-place Addition (+=)" << std::endl;
-    sparse_matrix<double> matC = matA;
-    matC += matB;
-    std::cout << "matA += matB:" << std::endl;
+    sparse_matrix<double> matC = MatMain1;
+    matC += MatMain2;
+    std::cout << "MatMain1 += MatMain2:" << std::endl;
     print(matC);
     std::cout << std::endl;
 
     // Test 10: Matrix subtraction (operator-)
     std::cout << "Test 10: Matrix Subtraction" << std::endl;
-    sparse_matrix<double> matDiff = matB - matA;
-    std::cout << "Matrix B - Matrix A:" << std::endl;
+    sparse_matrix<double> matDiff = MatMain1 - MatMain2;
+    std::cout << "MatMain1 - MatMain2:" << std::endl;
     print(matDiff);
     std::cout << std::endl;
 
     // Test 11: operator-= (in-place subtraction)
     std::cout << "Test 11: In-place Subtraction (-=)" << std::endl;
-    sparse_matrix<double> matD = matB;
-    matD -= matA;
-    std::cout << "matB -= matA:" << std::endl;
+    sparse_matrix<double> matD = MatMain1;
+    matD -= MatMain2;
+    std::cout << "MatMain1 -= MatMain2:" << std::endl;
     print(matD);
     std::cout << std::endl;
 
     // Test 12: Matrix-Vector multiplication
     std::cout << "Test 12: Matrix-Vector Multiplication" << std::endl;
-    sparse_matrix<double> matMV(3, 2.0);
-    dynamic_vector<double> vec(2, 1.0);
-    dynamic_vector<double> result = MatMain * vec;
-    std::cout << "Matrix (3x3, diag=2.0) * Vector (size 3, all 1.0):" << std::endl;
+    dynamic_vector<double> vec(3, 1.0);
+    dynamic_vector<double> result = MatMain1 * vec;
+    std::cout << "MatMain1 * (1,1,1)" << std::endl;
     std::cout << "Result size: " << result.size() << std::endl;
     std::cout << result;
     std::cout << std::endl;
 
     // Test 13: Matrix-Matrix multiplication
-    std::cout << "Test 13: Matrix-Matrix Multiplication" << std::endl;
-    sparse_matrix<double> matX(2, 6.0);
-    sparse_matrix<double> matY(2, 2.0);
-    
-    sparse_matrix<double> matProd = MatMain * matY;
-    std::cout << "Matrix MatMain (2x2, 1,2,3,4) * Matrix Y (2x2, diag=2.0):" << std::endl;
+    std::cout << "Test 13: Matrix-Matrix Multiplication" << std::endl;    
+    sparse_matrix<double> matProd = MatMain1 * MatMain2;
+    std::cout << "MatMain1 * MatMain2:" << std::endl;
     print(matProd);
     std::cout << std::endl;
 
     // Test 14: Transpose    
-    std::cout << "Original matrix: MatMain" << std::endl;
-    print(MatMain);
+    std::cout << "Original matrix: MatMain1" << std::endl;
+    print(MatMain1);
     std::cout << "\nTransposed matrix:" << std::endl;
-    sparse_matrix<double> matTransposed = transpose(MatMain);
+    sparse_matrix<double> matTransposed = transpose(MatMain1);
     print(matTransposed);
     std::cout << std::endl;
 
     // Test 15: Diagonal extraction
     std::cout << "Test 15: Diagonal Extraction" << std::endl;
-    sparse_matrix<double> matDiagonal = diagonal(MatMain);
-    std::cout << "Diagonal of MatMain:" << std::endl;
+    sparse_matrix<double> matDiagonal = diagonal(MatMain1);
+    std::cout << "Diagonal of MatMain1:" << std::endl;
     print(matDiagonal);
     std::cout << std::endl;
 
-/*
+
     // Test 16: printf function (write to file)
     std::cout << "Test 16: Printf Function (write to file)" << std::endl;
     std::ofstream outfile("sparse_matrix_output.txt");
     if (outfile.is_open()) {
         std::cout << "Writing matrix to 'sparse_matrix_output.txt'..." << std::endl;
-        printf(mat2, outfile);
+        printf(MatMain1, outfile);
         outfile.close();
         std::cout << "File written successfully!" << std::endl;
     } else {
         std::cout << "Failed to open output file!" << std::endl;
     }
     std::cout << std::endl;
-*/
+
     std::cout << "==== All Tests Completed ====" << std::endl;
     
     return 0;
