@@ -2,6 +2,7 @@
 
 #include "class_node.hpp"
 #include "class_point.hpp"
+#include <cmath>
 
 #include <iostream>
 
@@ -16,6 +17,9 @@ protected:
     point2d centroid_; // coordinates of the centroid
     std::array<point2d, NVERTICES> normals_; // coordinates of the outgoing unit normals to faces
     std::array<double, NVERTICES> faces_length_; // faces lengths
+
+    std::array<int, NVERTICES> neighbors_; // indices globaux parmis les {triangles} des adjacents
+    std::array<int, NVERTICES> faces_; // indices globaux des edges de l'élément 
     
 public:
     element();                             //  default constructor
@@ -29,19 +33,30 @@ public:
     node<T>*& vertex(std::size_t i) { return this->vertices_[i]; };      //  get ith vertex address (pointer)
 
     inline double area() const { return area_; };
-    inline void set_area(double a) const { area_ = a; };
+    inline void set_area(double a) { area_ = a; };
+    inline point2d centroid() {return centroid_;};
+    inline std::array<double, NVERTICES> faces_length() { return faces_length_;};
+    inline point2d normal(size_t ii) const { return normals_[ii];};
+    inline int neighbor(std::size_t i) const {return this->neighbors_[i];};
+    inline void set_neighbor_index(std::size_t ii, int jj) {this->neightbors_[ii] = jj;}
+    inline int face(std::size_t i) const {return this->faces_[i];};
+    inline int& face(std::size_t i){return this->faces_[i];};
+
     const element<T, NVERTICES>& operator=(element<T, NVERTICES>&);
     ~element();
 
     void reset_indices();               //  reset vertices indices to -1
     void indexing_vertices(int& count); //  indexing the vertices
 
+    inline int index() const { return index_;};
+    inline void set_index(int ind){ index_ = ind;};
+
     template <typename S, int MVERTICES>
     friend std::ostream& operator<<(std::ostream& os, element<S, MVERTICES> const& e);
     void print_vertices_indices();
 
 
-    void compute_are();
+    void compute_area();
     void compute_centroid();
     void compute_normals();
     void compute_faces_length();
@@ -109,7 +124,7 @@ void element<T, NVERTICES>::compute_centroid()
 } // compute_centroid
 
 template <typename T, int NVERTICES>
-void element<T, NVERTICES>::compute_are() // are for triangles
+void element<T, NVERTICES>::compute_area() // area for triangles
 {
     double x0 = this->vertices_[0]->x();
     double y0 = this->vertices_[0]->y();
@@ -174,6 +189,7 @@ const element<T, NVERTICES>& element<T, NVERTICES>::operator=(element<T, NVERTIC
             this->vertices_[i] = e.vertices_[i];
             this->vertices_[i]->more_sharing_elements();
         }
+        this->set_index(e.index());
     }
     return *this;
 } //  assignment operator

@@ -2,6 +2,7 @@
 #include "class_mesh.hpp"
 #include "class_node.hpp"
 #include "class_point.hpp"
+#include "class_advection_solver.hpp"
 
 #include <iostream>
 
@@ -11,9 +12,9 @@ int main()
     std::vector<triangle> triangles;
 
     // loads mesh data from .mesh file
-    std::string meshFile = "first.mesh";
+    //std::string meshFile = "first.mesh";
     //std::string meshFile = "ell.mesh";
-    //std::string meshFile = "ex.mesh";
+    std::string meshFile = "ex.mesh";
     bool res               = mesh_reader(meshFile, vertices, triangles);
 
     std::size_t n_vertices = vertices.size();
@@ -23,23 +24,15 @@ int main()
     std::cout << "number of elements from mesh file= " << triangles.size() << std::endl;
 
     // form the mesh
-    triangulation ell(triangles[0]); // first item will be doubled
+    triangulation mesh(triangles,vertices);// first item will be doubled
 
-    // populate mesh with triangles and free copied triangles
-    for (auto new_triangle : triangles)
-    {
-        ell.append(new_triangle);
-        new_triangle.~triangle();
-    }
+    advection_solver gaussienne(mesh);
+    point2d velocity(1.0, 0.0);
+    double Tmax = 3.;
 
-    ell.drop_first_item(); // first item is removed
+    gaussienne.advance(Tmax, velocity);
 
-    std::cout << "number of triangles from mesh structure= " << ell.length() << std::endl;
-    //std::cout << "number of triangles obtained from indexing in mesh structure= " << ell.indexing_elements() << std::endl;
-    std::cout << "number of vertices from mesh structure= " << ell.indexing_vertices() << std::endl;
-
-    std::cout << " -- enter build_edges --  " << std::endl;
-    ell.build_edges(ell.indexing_vertices());
+    
 
     return 0;
 }

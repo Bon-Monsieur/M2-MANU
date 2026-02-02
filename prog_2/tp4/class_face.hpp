@@ -11,6 +11,10 @@ class face
 {
 protected:
     node<T>* vertices_[NVERTICES];
+    int index_; // indice globaux des arêtes
+    std::array<int, NVERTICES> neighbors_; // indices des triangles voisins
+    std::array<triangle*, NVERTICES> p_neighbors_; // adresses des 
+
 
 public:
     face();                          // default constructor
@@ -23,6 +27,12 @@ public:
 
     double x() const {return vertices_[0]->location_[0];};
     double y() const {return vertices_[1]->location_[1];};
+
+    inline int neighbor(std::size_t i) const {return this->neighbors_[i];};
+    inline int& neighbor(std::size_t i) {return this->neighbors_[i];};
+
+    inline triangle& p_neighbor(std::size_t i) const {return this->p_neighbors_[i];};
+    inline void set_p_neighbor(std::size_t i, triangle* pt) {p_neighbors_[i]=pt; };
 };
 
 // face for d=2
